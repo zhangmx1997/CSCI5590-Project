@@ -11,7 +11,7 @@ contract Library {
     uint[2][16] public counters = [[9,0], [5,0], [2,0], [4,0], [4,0], [2,0], [5,0], [9,0], [9,0], [5,0], [2,0], [4,0], [4,0], [2,0], [5,0], [9,0]]; // number of books
 
     // borrow books
-    function adopt(uint bookId) public returns (uint) {
+    function borrow(uint bookId) public returns (uint) {
         require(bookId >= 0 && bookId <= 15);  // ensure id does NOT exceed boundary
         require(counters[bookId][0] > 0); // ensure more than 1 book is left
         users[bookId].push(msg.sender);        // save address of those borrowing books
@@ -32,7 +32,7 @@ contract Library {
                 break;
             }
         }
-        require(_match); // only the user who borrowed this book and return it
+        require(_match); // only the user who borrowed this book can return it
          
         counters[bookId][0] = counters[bookId][0] + 1;  
         counters[bookId][1] = counters[bookId][1] - 1; // update counters

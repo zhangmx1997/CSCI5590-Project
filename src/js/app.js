@@ -110,7 +110,7 @@ App = {
         /*console.log("adopt");
         console.log(bookId, account);
         console.log("\n\n");*/
-        return libraryInstance.adopt(bookId, {from: account});
+        return libraryInstance.borrow(bookId, {from: account});
       }).then(function(result) {
         return App.markBorrowed();
       }).catch(function(err) {
