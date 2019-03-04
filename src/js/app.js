@@ -60,17 +60,19 @@ App = {
     App.contracts.Adoption.deployed().then(function(instance) {
       adoptionInstance = instance;    
       // 调用合约的getAdopters(), 用call读取信息不用消耗gas
-      return adoptionInstance.getAdopters.call();
-    }).then(function(adopters) {
-      for (i = 0; i < adopters.length; i++) {
-        console.log(adopters[i]);
-        if (adopters[i] !== '0x0000000000000000000000000000000000000000') { // has been borrowed
+      //return adoptionInstance.getAdopters.call();
+      return adoptionInstance.getCounters.call();
+    }).then(function(counters) {
+      for (i = 0; i < counters.length; i++) {
+        //console.log(counters[i]);
+        if (counters[i][0] <= 0) { // all have been borrowed
           $('.panel-pet').eq(i).find('#adopt').text('Borrowed').attr('disabled', true);
           $('.panel-pet').eq(i).find('#return').text('Return').attr('disabled', false);
         }
-        else { // has NOT been borrowed
+        else { // have some left
           $('.panel-pet').eq(i).find('#adopt').text('Borrow').attr('disabled', false);
-          $('.panel-pet').eq(i).find('#return').text('Return').attr('disabled', true);
+          if (counters[i][1] <= 0) // no one still keeping this book
+            $('.panel-pet').eq(i).find('#return').text('Return').attr('disabled', true);
         }
       }
     }).catch(function(err) {
