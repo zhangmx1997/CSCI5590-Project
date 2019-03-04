@@ -1,6 +1,11 @@
 pragma solidity ^0.5.0;
 
 contract Adoption {
+    event Adopt (
+        address indexed _from,
+        uint indexed _id,
+        address indexed logged_addr
+    );
     address[16] public adopters;  // 保存领养者的地址
 
     // 领养宠物
