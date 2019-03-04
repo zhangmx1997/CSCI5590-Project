@@ -1,0 +1,130 @@
+[
+  {
+    "id": 0,
+    "name": "Becoming",
+    "picture": "images/becoming.jpg",
+    "age": 15,
+    "breed": "Michelle Obama",
+    "location": "America"
+  },
+  {
+    "id": 1,
+    "name": "A Curve in the Road",
+    "picture": "images/a-curve-in-the-road.jpg",
+    "age": 2,
+    "breed": "Julianne MacLean",
+    "location": "America"
+  },
+  {
+    "id": 2,
+    "name": "Stillhouse-Lake",
+    "picture": "images/Stillhouse-Lake.jpg",
+    "age": 5,
+    "breed": "Rachel Caine",
+    "location": "Canada"
+  },
+  {
+    "id": 3,
+    "name": "A Lily in the Light",
+    "picture": "images/A-Lily-in-the-Light.jpg",
+    "age": 9.7,
+    "breed": "Kristin Fields",
+    "location": "Brooklyn"
+  },
+  {
+    "id": 4,
+    "name": "Cutting for Stone",
+    "picture": "images/Cutting-for-Stone.jpg",
+    "age": 10.41,
+    "breed": "Abraham Verghese",
+    "location": "America"
+  },
+  {
+    "id": 5,
+    "name": "Dune",
+    "picture": "images/Dune.jpg",
+    "age": 8.54,
+    "breed": "Frank Herbert",
+    "location": "America"
+  },
+  {
+    "id": 6,
+    "name": "Lolita",
+    "picture": "images/Lolita.jpg",
+    "age": 10.82,
+    "breed": "Vladimir Nabokov",
+    "location": "Russia"
+  },
+  {
+    "id": 7,
+    "name": "Silent Spring",
+    "picture": "images/Silent-Spring.jpg",
+    "age": 21.25,
+    "breed": "Rachel Carson",
+    "location": "Pennsylvania"
+  },
+  {
+    "id": 8,
+    "name": "The Book Thief",
+    "picture": "images/The-Book-Thief.jpg",
+    "age": 9.99,
+    "breed": "Markus Zusak",
+    "location": "Australia"
+  },
+  {
+    "id": 9,
+    "name": "The Giver",
+    "picture": "images/The-Giver.jpg",
+    "age": 7.31,
+    "breed": "Lois Lowry",
+    "location": "America"
+  },
+  {
+    "id": 10,
+    "name": "The Road",
+    "picture": "images/The-Road.jpg",
+    "age": 12.81,
+    "breed": "Cormac McCarthy",
+    "location": "America"
+  },
+  {
+    "id": 11,
+    "name": "The Right Stuff",
+    "picture": "images/The-Right-Stuff.jpg",
+    "age": 4.61,
+    "breed": "Tom Wolfe",
+    "location": "America"
+  },
+  {
+    "id": 12,
+    "name": "The Wind in the Willows",
+    "picture": "images/The-Wind-in-the-Willows.jpg",
+    "age": 67.78,
+    "breed": "Kenneth Grahame",
+    "location": "Scottish"
+  },
+  {
+    "id": 13,
+    "name": "To Kill a Mockingbird",
+    "picture": "images/To-Kill-a-Mockingbird.jpg",
+    "age": 17.67,
+    "breed": "Harper Lee",
+    "location": "France"
+  },
+  {
+    "id": 14,
+    "name": "Valley of the Dolls",
+    "picture": "images/Valley-of-the-Dolls.jpg",
+    "age": 8.26,
+    "breed": "Jacqueline Susann",
+    "location": "England"
+  },
+  {
+    "id": 15,
+    "name": "The Very Hungry Caterpillar",
+    "picture": "images/The-Very-Hungry-Caterpillar.jpg",
+    "age": 6.34,
+    "breed": "Eric Carle",
+    "location": "America"
+  }
+]

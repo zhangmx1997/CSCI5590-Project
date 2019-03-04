@@ -3,21 +3,23 @@ App = {
   contracts: {},
 
   init: async function() {
-    // Load pets.
-    $.getJSON('../pets.json', function(data) {
-      var petsRow = $('#petsRow');
-      var petTemplate = $('#petTemplate');
+    // Load books.
+    $.getJSON('../books.json', function(data) {
+      var booksRow = $('#booksRow');
+      var bookTemplate = $('#bookTemplate');
 
       for (i = 0; i < data.length; i ++) {
-        petTemplate.find('.panel-title').text(data[i].name);
-        petTemplate.find('img').attr('src', data[i].picture);
-        petTemplate.find('.pet-breed').text(data[i].breed);
-        petTemplate.find('.pet-age').text(data[i].age);
-        petTemplate.find('.pet-location').text(data[i].location);
-        petTemplate.find('.btn-adopt').attr('data-id', data[i].id);
-        petTemplate.find('.btn-return').attr('data-id', data[i].id);
-
-        petsRow.append(petTemplate.html());
+        bookTemplate.find('.panel-title').text(data[i].name);
+        bookTemplate.find('img').attr('src', data[i].picture);
+        bookTemplate.find('img').attr('width', 100);
+        bookTemplate.find('img').attr('height', 200);
+        bookTemplate.find('.author').text(data[i].breed);
+        bookTemplate.find('.price').text(data[i].age);
+        bookTemplate.find('.book-location').text(data[i].location);
+        bookTemplate.find('.btn-borrow').attr('data-id', data[i].id);
+        bookTemplate.find('.btn-return').attr('data-id', data[i].id);
+        bookTemplate.find('.book-num').text(0);
+        booksRow.append(bookTemplate.html());
       }
     });
 
@@ -37,42 +39,47 @@ App = {
   },
 
   initContract: function() {
-    // 加载Adoption.json，保存了Adoption的ABI（接口说明）信息及部署后的网络(地址)信息，它在编译合约的时候生成ABI，在部署的时候追加网络信息
-    $.getJSON('Adoption.json', function(data) {
-      // 用Adoption.json数据创建一个可交互的TruffleContract合约实例。
-      var AdoptionArtifact = data;
-      App.contracts.Adoption = TruffleContract(AdoptionArtifact);
+    // load Library.json，保存了Library的ABI（接口说明）信息及部署后的网络(地址)信息，它在编译合约的时候生成ABI，在部署的时候追加网络信息
+    $.getJSON('Library.json', function(data) {
+      // Library.json数据创建一个可交互的TruffleContract合约实例。
+      console.log(data);
+      var LibraryArtifact = data;
+      App.contracts.Library = TruffleContract(LibraryArtifact);
       // Set the provider for our contract
-      App.contracts.Adoption.setProvider(App.web3Provider);
-      // Use our contract to retrieve and mark the adopted pets
-      return App.markAdopted(); // do NOT retrieve adopted pets at init
+      App.contracts.Library.setProvider(App.web3Provider);
+      // Use our contract to retrieve and mark the borrowed books
+      return App.markBorrowed(); // retrieve past state at init time
     });
     return App.bindEvents();
   },
 
   bindEvents: function() {
-    $(document).on('click', '.btn-adopt', App.handleAdopt);
+    $(document).on('click', '.btn-borrow', App.handleBorrow);
     $(document).on('click', '.btn-return', App.handleReturn);
   },
 
-  markAdopted: function(adopters, account) {
-    var adoptionInstance;
-    App.contracts.Adoption.deployed().then(function(instance) {
-      adoptionInstance = instance;    
-      // 调用合约的getAdopters(), 用call读取信息不用消耗gas
-      //return adoptionInstance.getAdopters.call();
-      return adoptionInstance.getCounters.call();
+  markBorrowed: function(users, account) {
+    var libraryInstance;
+    App.contracts.Library.deployed().then(function(instance) {
+      libraryInstance = instance;    
+      // call function getUsers(), do not consume gas using call()
+      //return libraryInstance.getUsers.call();
+      return libraryInstance.getCounters.call();
     }).then(function(counters) {
       for (i = 0; i < counters.length; i++) {
-        //console.log(counters[i]);
+        console.log(counters[i]);
         if (counters[i][0] <= 0) { // all have been borrowed
-          $('.panel-pet').eq(i).find('#adopt').text('Borrowed').attr('disabled', true);
-          $('.panel-pet').eq(i).find('#return').text('Return').attr('disabled', false);
+          $('.panel-book').eq(i).find('#borrow').text('Borrowed').attr('disabled', true);
+          $('.panel-book').eq(i).find('#return').text('Return').attr('disabled', false);
+          console.log('ok1');
+          $('.panel-book').eq(i).find('#count').text(counters[i][0]);
         }
         else { // have some left
-          $('.panel-pet').eq(i).find('#adopt').text('Borrow').attr('disabled', false);
+          $('.panel-book').eq(i).find('#borrow').text('Borrow').attr('disabled', false);
+          console.log('ok2');
+          $('.panel-book').eq(i).find('#count').text(counters[i][0]);
           if (counters[i][1] <= 0) // no one still keeping this book
-            $('.panel-pet').eq(i).find('#return').text('Return').attr('disabled', true);
+            $('.panel-book').eq(i).find('#return').text('Return').attr('disabled', true);
         }
       }
     }).catch(function(err) {
@@ -85,27 +92,27 @@ App = {
 
 
 
-  handleAdopt: function(event) {
+  handleBorrow: function(event) {
     event.preventDefault();
 
-    var petId = parseInt($(event.target).data('id'));
-    var adoptionInstance;
-    // 获取用户账号
+    var bookId = parseInt($(event.target).data('id'));
+    var libraryInstance;
+    // get user account
     web3.eth.getAccounts(function(error, accounts) {
       if (error) {
         console.log(error);
       }
       var account = accounts[0];
 
-      App.contracts.Adoption.deployed().then(function(instance) {
-        adoptionInstance = instance;
-        // 发送交易领养宠物
-        console.log("adopt");
-        console.log(petId, account);
-        console.log("\n\n");
-        return adoptionInstance.adopt(petId, {from: account});
+      App.contracts.Library.deployed().then(function(instance) {
+        libraryInstance = instance;
+        // send transaction to borrow a book
+        /*console.log("adopt");
+        console.log(bookId, account);
+        console.log("\n\n");*/
+        return libraryInstance.adopt(bookId, {from: account});
       }).then(function(result) {
-        return App.markAdopted();
+        return App.markBorrowed();
       }).catch(function(err) {
         console.log(err.message);
       });
@@ -116,26 +123,26 @@ App = {
   handleReturn: function(event) {
     event.preventDefault();
 
-    var petId = parseInt($(event.target).data('id'));
-    var adoptionInstance;
-    // 获取用户账号
+    var bookId = parseInt($(event.target).data('id'));
+    var libraryInstance;
+    // get user account
     web3.eth.getAccounts(function(error, accounts) {
       if (error) {
         console.log(error);
       }
       var account = accounts[0];
 
-      App.contracts.Adoption.deployed().then(function(instance) {
-        adoptionInstance = instance;
-        // 发送交易return pet
-        console.log("return");
-        console.log(petId, account);
-        console.log("\n\n");
-        return adoptionInstance.giveback(petId, {from: account});
+      App.contracts.Library.deployed().then(function(instance) {
+        libraryInstance = instance;
+        // send transaction to return a book
+        /*console.log("return");
+        console.log(bookId, account);
+        console.log("\n\n");*/
+        return libraryInstance.giveback(bookId, {from: account});
       }).then(function(result) {
-        return App.markAdopted();
+        return App.markBorrowed();
       }).catch(function(err) {
-        /*var event = adoptionInstance.Adopt(function(error, result){
+        var event = libraryInstance._library(function(error, result){
           console.log("Event are as following:-------");         
           for(let key in result){
            console.log(key + " : " + result[key]);
@@ -143,26 +150,12 @@ App = {
           if(error)
             console.log(error);
           console.log("Event ending-------");
-        });*/
-
-
-        var retValueEvent = Adoption.Adopt();
-        retValueEvent.watch(function(err, result){
-          if(err){
-            console.log(err);
-          }
-          else {
-            console.log(result.args._from);
-            console.log(result.args._id);
-            console.log(result.args.logged_addr);
-          }
         });
+
         console.log(err.message);
       });
     });
   }
-
-
 
 };
 
