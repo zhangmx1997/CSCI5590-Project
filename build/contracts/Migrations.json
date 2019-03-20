@@ -1379,8 +1379,8 @@
       "transactionHash": "0xfc68ce80531a35767cde278f93563d7b6dff0590e921584dc713eddc6ea24f2a"
     }
   },
-  "schemaVersion": "3.0.2",
-  "updatedAt": "2019-03-04T20:01:51.615Z",
+  "schemaVersion": "3.0.3",
+  "updatedAt": "2019-03-20T07:48:02.023Z",
   "devdoc": {
     "methods": {}
   },

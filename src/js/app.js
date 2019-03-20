@@ -75,7 +75,8 @@ App = {
           $('.panel-book').eq(i).find('#count').text(counters[i][0]);
         }
         else { // have some left
-          $('.panel-book').eq(i).find('#borrow').text('Borrow').attr('disabled', false);
+          $('.panel-book').eq(i).find('#borrow').text('Borrow').attr('disabled', false);            
+          $('.panel-book').eq(i).find('#return').text('Return').attr('disabled', false);
           console.log('ok2');
           $('.panel-book').eq(i).find('#count').text(counters[i][0]);
           if (counters[i][1] <= 0) // no one still keeping this book

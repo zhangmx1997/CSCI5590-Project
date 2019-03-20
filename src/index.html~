@@ -42,7 +42,7 @@
             <img alt="140x140" data-src="holder.js/140x140" class="img-rounded img-center" style="width: 100%;" src="https://animalso.com/wp-content/uploads/2017/01/Golden-Retriever_6.jpg" data-holder-rendered="true">
             <br/><br/>
             <strong>Author</strong>: <span class="author">Golden Retriever</span><br/>
-            <strong>Price</strong>: <span class="price">3</span><br/>
+            <strong>Price</strong>: <span class="pet-age">3</span><br/>
             <strong>Location</strong>: <span class="book-location">Warren, MI</span><br/><br/>
             <strong>#Left</strong>: <span id="count" class="book-num">0</span><br/><br/>
             <button class="btn btn-default btn-borrow" type="button" id="borrow" data-id="0">Borrow</button>
