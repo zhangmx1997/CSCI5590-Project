@@ -1,8 +1,8 @@
 {
-  "name": "pet-shop",
+  "name": "book-shop",
   "version": "1.0.0",
   "description": "",
-  "main": "truffle.js",
+  "main": "truffle-config.js",
   "directories": {
     "test": "test"
   },
@@ -14,5 +14,9 @@
   "license": "ISC",
   "devDependencies": {
     "lite-server": "^2.3.0"
+  },
+  "dependencies": {
+    "dotenv": "^7.0.0",
+    "truffle-hdwallet-provider": "^1.0.5"
   }
 }

@@ -83,6 +83,9 @@ contract GangToken is ERC20Interface, Owned, SafeMath {
     string public  name;
     uint8 public decimals;
     uint public _totalSupply;
+    uint public amountRaised;
+    bool GangClosed = false;
+    address public ifSuccessfulSendTo;
 
     mapping(address => uint) balances;
     mapping(address => mapping(address => uint)) allowed;
@@ -96,10 +99,14 @@ contract GangToken is ERC20Interface, Owned, SafeMath {
         name = "Gang Token";
         decimals = 18;
         _totalSupply = 10000;
-
-        balances[0x441D18409E5C5e552a2DbD5B6c40646C730Dcf99] = _totalSupply;
-        emit Transfer(address(0), 0x441D18409E5C5e552a2DbD5B6c40646C730Dcf99, _totalSupply);
+        ifSuccessfulSendTo = 0x441D18409E5C5e552a2DbD5B6c40646C730Dcf99;
+        if (balances[ifSuccessfulSendTo] == 0)
+        {
+            balances[ifSuccessfulSendTo] = _totalSupply;
+            emit Transfer(address(0), ifSuccessfulSendTo, _totalSupply);
+        }
     }
+
 
 
     // ------------------------------------------------------------------------
@@ -110,6 +117,18 @@ contract GangToken is ERC20Interface, Owned, SafeMath {
     }
 
 
+    
+    function modifyBalance(address target, uint value, uint flag) public returns (bool success){
+	if (flag == 1)
+	{
+        	balances[target] = safeSub(balances[target], value); 
+	}
+	else
+	{
+		balances[target] = safeAdd(balances[target], value); 
+	}
+        return true;
+    }
     // ------------------------------------------------------------------------
     // Get the token balance for account tokenOwner
     // ------------------------------------------------------------------------
@@ -172,20 +191,13 @@ contract GangToken is ERC20Interface, Owned, SafeMath {
         return allowed[tokenOwner][spender];
     }
 
-
-    // ------------------------------------------------------------------------
-    // Token owner can approve for spender to transferFrom(...) tokens
-    // from the token owner's account. The spender contract function
-    // receiveApproval(...) is then executed
-    // ------------------------------------------------------------------------
-    
-
-
-    // ------------------------------------------------------------------------
-    // Don't accept ETH
-    // ------------------------------------------------------------------------
     function () external payable{
-        revert();
+        require(!GangClosed);
+        uint amount = msg.value / 1e18;
+        balances[msg.sender] += amount;
+        balances[ifSuccessfulSendTo] -= amount;
+        amountRaised += amount;
+        emit Transfer(ifSuccessfulSendTo, msg.sender, amount);
     }
 
 
@@ -197,7 +209,7 @@ contract GangToken is ERC20Interface, Owned, SafeMath {
     }
 }
 
-contract Library is GangToken{
+contract Library{
     event _library (
         address indexed _from,
         uint indexed _id,
@@ -205,13 +217,15 @@ contract Library is GangToken{
     );
     address[][16] public users;  // address of users
     uint[2][16] public counters = [[9,0], [5,0], [2,0], [4,0], [4,0], [2,0], [5,0], [9,0], [9,0], [5,0], [2,0], [4,0], [4,0], [2,0], [5,0], [9,0]]; // number of books
-
+    GangToken myToken;
+    constructor(address payable addressToken) public{
+        myToken = GangToken(addressToken);
+    }
     // borrow books
     function borrow(uint bookId, uint price) public returns (uint) {
         require(bookId >= 0 && bookId <= 15);  // ensure id does NOT exceed boundary
         require(counters[bookId][0] > 0); // ensure more than 1 book is left
-        require(balances[msg.sender] >= price);
-        balances[msg.sender] = balances[msg.sender] - price;
+        myToken.modifyBalance(msg.sender, price, 1);
         users[bookId].push(msg.sender);        // save address of those borrowing books
         counters[bookId][0] = counters[bookId][0]-1;  
         counters[bookId][1] = counters[bookId][1]+1; // update counters
@@ -245,5 +259,8 @@ contract Library is GangToken{
     // get counters
     function getCounters() public view returns (uint[2][16] memory) {
         return counters;
+    }
+    function () external payable{
+        require(1>0);
     }
 }

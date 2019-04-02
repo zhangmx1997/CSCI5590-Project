@@ -31,11 +31,13 @@ App = {
     // Is there an injected web3 instance?
     if (typeof web3 !== 'undefined') {
       App.web3Provider = web3.currentProvider;
+      console.log(App.web3Provider);
     } else {
     // If no injected web3 instance is detected, fall back to Ganache
-      App.web3Provider = new Web3.providers.HttpProvider('http://localhost:7545');
+      App.web3Provider = new Web3.providers.HttpProvider('ropsten.infura.io/v3/20401dc3e9834236b08463d5ae5a4616');
     }
     web3 = new Web3(App.web3Provider);
+    console.log(web3);
     return App.initContract();
   },
 
@@ -43,28 +45,34 @@ App = {
     // load Library.json, which stores ABI of Library
 
     $.getJSON('Library.json', function(data) {
+      console.log(data);
       // use the data from Library.json to create an interactive instance of TruffleContract
-      var LibraryArtifact = data;
-      App.contracts.Library = TruffleContract(LibraryArtifact);
+      App.contracts.Library = TruffleContract(data);
       // Set the provider for our contract
       App.contracts.Library.setProvider(App.web3Provider);
       // Use our contract to retrieve and mark the borrowed books
       return App.markBorrowed(); // retrieve past state at init time
     });
+
+    $.getJSON('GangToken.json', function(data) {
+      // use the data from Library.json to create an interactive instance of TruffleContract
+      console.log(data);
+      var GangArtifact = data;
+      App.contracts.GangToken = TruffleContract(GangArtifact);
+      // Set the provider for our contract
+      App.contracts.GangToken.setProvider(App.web3Provider);
+    });
+
     return App.bindEvents();
   },
 
-    login: function(){
-      var netid = Number(document.getElementById('loginid').value);
-      App.accounts = web3.eth.accounts;
-      App.cur_account = App.accounts[netid];
-      web3.eth.defaultAccount = App.cur_account;
-
-  },
-    checkBalance: function(){
-      App.contracts.Library.deployed().then(function(instance){
-      var balance = instance.balanceOf(App.cur_account, {gas: 1000000});
+  checkBalance: function(){
+      App.cur_account = web3.eth.accounts[0];
+      App.contracts.GangToken.deployed().then(function(instance){
+      console.log(App.cur_account);
+      var balance = instance.balanceOf(App.cur_account);
       balance.then(function(result){
+        console.log(result)
         document.getElementById("mybalance").value = result;
       });
       });
@@ -73,26 +81,25 @@ App = {
   bindEvents: function() {
     $(document).on('click', '.btn-borrow', App.handleBorrow);
     $(document).on('click', '.btn-return', App.handleReturn);
-    $(document).on('click', '.btn-getcoins', App.getCoins);
-    $(document).on('click', '.btn-login', App.login);
     $(document).on('click', '.btn-balance', App.checkBalance);
     $(document).on('click', '.btn-give', App.giveGang);
   },
   giveGang: function(){
-    var recid = Number(document.getElementById('recipient').value);
+    var recaddr = document.getElementById('recipient').value;
     var amount = Number(document.getElementById('amount').value);
-      App.contracts.Library.deployed().then(function(instance){
-        instance.transfer(App.accounts[recid], amount);
+      App.contracts.GangToken.deployed().then(function(instance){
+          instance.modifyBalance(App.cur_accounts, amount, 1);
+          instance.modifyBalance(recaddr, amount, 0);
     });
   },
   markBorrowed: function(users, account) {
-    var libraryInstance;
+    console.log(App.contracts);
+    console.log(App.contracts.Library.deployed());
     App.contracts.Library.deployed().then(function(instance) {
-      libraryInstance = instance;
-      // call function getUsers(), do not consume gas using call()
-      //return libraryInstance.getUsers.call();
-      return libraryInstance.getCounters.call();
+      //return instance.counters;
+      return instance.getCounters.call();
     }).then(function(counters) {
+      console.log(counters);
       for (i = 0; i < counters.length; i++) {
         //console.log(counters[i]);
         if (counters[i][0] <= 0) { // all have been borrowed
@@ -123,9 +130,11 @@ App = {
     event.preventDefault();
     var bookId = parseInt($(event.target).data('id'));
     var bookPrice = parseInt(document.getElementsByClassName("price")[bookId].innerText);
+    console.log(bookId);
+    console.log(bookPrice);
     // Now start borrowing
     App.contracts.Library.deployed().then(function(instance){
-      return instance.borrow(bookId, bookPrice, {gas: 1000000});
+      return instance.borrow(bookId, bookPrice, {from:App.cur_account, gas:10000000});
     }).then(function(result){
         return App.markBorrowed();
     }).catch(function(err){
@@ -134,18 +143,6 @@ App = {
     });
   },
 
-  getCoins: function(event) {
-      // start transfering
-    App.contracts.Library.deployed().then(function(instance){
-      web3.eth.sendTransaction({from: App.cur_account, to: App.accounts[0], value: web3.toWei(1,'ether')});
-      instance.transfer(App.cur_account, 10, {from: App.accounts[0]});
-      var balance = instance.balanceOf(App.cur_account);
-      // alert to inform the balance of current accounts
-      balance.then(function(result){window.alert(result)});
-      console.log(instance.balanceOf(App.cur_account));
-      console.log(instance.totalSupply());
-    });
-  },
   handleReturn: function(event) {
     event.preventDefault();
 
